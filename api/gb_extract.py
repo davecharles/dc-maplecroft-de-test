@@ -57,7 +57,9 @@ def fetch_geoboundary_url(country_code: str) -> str:
     """Fetch geoboundary URL.
 
     Given a country code, load a geoboundary resource for `ADMIN_AREA_LEVEL`
-    and extract `gjDownloadURL` URL.
+    and extract `gjDownloadURL` URL. If data cannot be retrieved for a given
+    `ADM` value we downgrade until all ADMs are exhausted. Exceptions raised
+    here should be caught so the site can be marked for reprocessing.
     """
     click.echo(f"Fetching geoboundary resource for {country_code}")
     geoboundary_uri = current_app.config.get("GEO_BOUNDARIES_URI")
@@ -66,10 +68,8 @@ def fetch_geoboundary_url(country_code: str) -> str:
         url = f"{geoboundary_uri}?ISO={country_code}&ADM={admin_area_level}"
         click.echo(f"Using URL: {url}")
         request = grequests.get(url).send()
-
-        # rs = (grequests.get(u) for u in [url])  # TODO REMOVE
-        # response = list(grequests.imap(rs))[0]
-
+        if not request.response.ok:
+            click.echo(f"Status: {request.response.status_code}")
         if len(request.response.json()):
             break
         click.echo(f"{admin_area_level} not available, downgrading")
@@ -82,7 +82,7 @@ def load_geoboundary_data(country_code) -> typing.Iterator[dict]:
     try:
         geo_resource_url = fetch_geoboundary_url(country_code)
         return get_geoboundary_features(geo_resource_url)
-    except KeyError as e:
-        click.echo(f"Key error while loading geoboundary data for: {country_code}")
-        click.echo(f"tip: this could mean there is no ADM data for this country")
+    except (KeyError, AttributeError) as e:
+        click.echo(f"Error '{e}' while loading geoboundary data for: {country_code}")
+        click.echo("tip: this could mean there is no ADM data for this country")
         return iter(())
