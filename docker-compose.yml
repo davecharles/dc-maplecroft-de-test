@@ -12,6 +12,8 @@ services:
       - DATABASE_URI=sqlite:////db/api.db
     volumes:
       - ./api:/code/api
+      - ./migrations:/code/migrations
+      - ./data:/code/data
       - ./db/:/db/
     ports:
       - "5000:5000"
