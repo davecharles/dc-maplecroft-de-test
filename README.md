@@ -1,5 +1,58 @@
 # maplecroft-de-test
 
+## Dave Charles thoughts and observations
+
+### Approach
+Given the framework provided I took a fairly simplistic approach that:
+- Grab a batch of URLs and creates/updates sites.
+- Determine admin area for each site, marking ones that could not be 
+  determined for future processing.
+  - I didn't implement the "future 
+    processing" bit as it's not that interesting, just a setting to pick up 
+    sites with an admin area of `NO_ADMIN_AREA`. 
+
+I'd consider this a useful spike, for a production ready system I would 
+probably investigate spawning worker processes to perform the extract and 
+transform concurrently, perhaps working off SQS queues or similar, providing
+greater scalability. For the purposes of this test that seemed over-kill.
+
+### Geoboundary data
+I noticed alternate geoboundary data (Arc, SHP files etc). I don't have
+experience with GIS systems so would seek advice on best approaches.  
+
+### Performance
+Given more time I would profile the solution (e.g. using `memory-profiler`, 
+`timeit` etc). I imagine efficiencies could be gained using something like 
+`rapidjson`. I would also investigate chunked transfer encoding for large
+resources. Additionally, caching resources using a backing service (redis etc)
+or leveraging a CDN might be appropriate.
+
+I used `functools.lru_cache` in a couple of choice places which improved
+processing time. I also cached downloaded geoboundary files 
+into the `data/` folder, but these sit on the container which is not ideal; 
+the deployment might have minimal filesystem space, and on container restarts 
+the files would be lost.
+
+### Data Observations
+- Hardly any RUS region data got allocated an `admin_area`. I would
+  investigate this, guessing there's something different in the layout of 
+  those geoboundary files.
+- Similarly, for IRL.
+
+### Requests
+This implementation uses [grequests](https://github.com/spyoungtech/grequests)
+which seems to work fine. However, in a subsequent iteration (especially after
+some performance testing) might consider other options. Maybe: 
+[requests-futures](https://github.com/ross/requests-futures) would be worth 
+considering.
+
+#### Database
+The `Site` table has a lot of duplication for stations of one master site
+(i.e. City, Country). This could be normalised out by adding a foreign key
+to Site relating a "master site" model.
+
+---
+
 Welcome to the Maplecroft data engineering technical test! This project
 contains an api only pre-built Flask application.
 
