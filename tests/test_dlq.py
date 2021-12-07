@@ -27,4 +27,4 @@ def test_log_no_admin_dlq(capsys):
     dlq.add_to_no_admin_dlq("site-id")
     dlq.log_no_admin_dlq()
     captured = capsys.readouterr()
-    assert "Admin area could not be identified these sites:\nsite-id" in captured.out
+    assert "Admin area could not be identified for these sites:\nsite-id" in captured.out

@@ -46,5 +46,5 @@ def log_no_admin_dlq():
     """Log all NO_ADMIN_DEAD_LETTER_QUEUE items."""
     no_admin_area_sites = "\n".join(list(unload_dlq(NO_ADMIN_DEAD_LETTER_QUEUE)))
     click.echo(
-        f"Admin area could not be identified these sites:\n{no_admin_area_sites}"
+        f"Admin area could not be identified for these sites:\n{no_admin_area_sites}"
     )
