@@ -1,6 +1,7 @@
 # maplecroft-de-test
 
-Welcome to the maplecroft data engineering techinical test! This project contains an api only pre-built Flask application.
+Welcome to the Maplecroft data engineering technical test! This project
+contains an api only pre-built Flask application.
 
 Maplecroft is a global risk analytics company that aims to standardise risk across a variety of different issues across the globe.
 To do this we are often tasked with assigning risk scores to customer provided sites. This inevitably leads to developing 
@@ -39,7 +40,7 @@ The project uses Java Web Tokens to manage authentication, go ahead and obtain a
 curl -X POST -H "Content-Type: application/json" -d '{"username": "admin", "password": "admin"}' http://localhost:5000/auth/login
 ```
 
-This will return something like
+This will return something like:
 
 ```bash
 {
@@ -48,7 +49,7 @@ This will return something like
 }
 ```
 
-You can use access_token to access protected endpoints :
+You can use access_token to access protected endpoints:
 
 ```bash
 curl -X GET -H "Content-Type: application/json" -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0eXBlIjoiYWNjZXNzIiwiaWRlbnRpdHkiOjEsImlhdCI6MTUxMDAwMDQ0MSwiZnJlc2giOmZhbHNlLCJqdGkiOiI2OTg0MjZiYi00ZjJjLTQ5MWItYjE5YS0zZTEzYjU3MzFhMTYiLCJuYmYiOjE1MTAwMDA0NDEsImV4cCI6MTUxMDAwMTM0MX0.P-USaEIs35CSVKyEow5UeXWzTQTrrPS_YjVsltqi7N4" http://127.0.0.1:5000/api/v1/users
@@ -61,16 +62,21 @@ curl -X GET -H "Content-Type: application/json" -H "Authorization: Bearer eyJhbG
 
 ### Overview
 
-Your task is to create a simple ETL pipeline that extracts site data from the free bike sharing data service CityBikes and allows querying
-of these sites by polictal adminstrative area (admin area).
-The CitBikes service exposes bike sharing locations across the world. You will need to extract the data from http://api.citybik.es/v2/networks 
-determine the polictal adminstrative area (admin area) using the [GeoBoundaries](https://www.geoboundaries.org/api.html) dataset and then load into the provided
-sqllite database.
+Your task is to create a simple ETL pipeline that extracts site data from
+the free bike sharing data service CityBikes and allows querying
+of these sites by political administrative area (admin area).
+The CityBikes service exposes bike sharing locations across the world. You
+will need to extract the data from http://api.citybik.es/v2/networks and then
+determine the political administrative area (admin area) using the
+[GeoBoundaries](https://www.geoboundaries.org/api.html) dataset. Finally, load
+the results into the provided SQLite database.
 
 ### Load
 
-An entry point for the script to pull from citybikes api and load into sqllite has been provided for you `api.manage.load_sites`. 
-You will also need to create a database model in `api.api.models.site`. When completed you can run the script with the following command
+An entry point for the script to pull from citybikes api and load into SQLite
+has been provided for you `api.manage.load_sites`. 
+You will also need to create a database model in `api.api.models.site`.
+When completed you can run the script with the following command:
 
 ```bash
 docker-compose exec web flask api load_sites
@@ -89,10 +95,11 @@ The admin area code that you have to assign is specified in the geoboundaries re
 
 ### API
 
-Once you have loaded data into the database you need to expose it through the api. An entry point and url has been 
-created for you. You just need to develop the logic in `api.api.resources.site.SiteList` 
+Once you have loaded data into the database you need to expose it through the api. An entry point and url has been
+created for you. You just need to develop the logic in `api.api.resources.site.SiteList`.
 
-The api should accept a query parameter `?admin_area` which returns all the sites within this admin area
+The api should accept a query parameter `?admin_area` which returns all the
+sites within this admin area, e.g:
 
 `localhost:5000/api/v1/sites?admin_area=GBR-ADM3-3_0_0-B1`
 
