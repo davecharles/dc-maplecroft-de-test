@@ -30,9 +30,7 @@ def load_master_site_urls(uri: str) -> typing.Generator[str, None, None]:
     if hasattr(request, "exception"):
         raise request.exception()
     elif not request.response.ok:
-        raise RuntimeError(
-            f"Load master sites failed: {request.response.status_code}"
-        )
+        raise RuntimeError(f"Load master sites failed: {request.response.status_code}")
     else:
         master_sites = (
             f"{uri}{network['href']}" for network in request.response.json()["networks"]
@@ -52,11 +50,9 @@ def make_sites(response: typing.Any):
     location = network["location"]
     city = location["city"]
     country_alpha2 = location["country"]
-    country = country_converter.convert(names=[country_alpha2], to='ISO3')
+    country = country_converter.convert(names=[country_alpha2], to="ISO3")
     stations = network["stations"]
-    click.echo(
-        f"Processing site at {response.url}: {len(stations)} station(s)"
-    )
+    click.echo(f"Processing site at {response.url}: {len(stations)} station(s)")
     for station in stations:
         try:
             site = Site(
@@ -105,9 +101,8 @@ def extract_sites(urls: list, timeout: float = 0.5):
 
 
 def process_chunk(
-        g: typing.Generator[str, None, None],
-        chunk_size: int = 10,
-        timeout: float = 1.0) -> bool:
+    g: typing.Generator[str, None, None], chunk_size: int = 10, timeout: float = 1.0
+) -> bool:
     """Process a chunk of URLs.
 
     Returns true if there is still work to do and false otherwise.

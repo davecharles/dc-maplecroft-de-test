@@ -72,14 +72,18 @@ def load_sites():
     timeout = current_app.config.get("RESPONSE_TIMEOUT_SECONDS")
     chunk_size = current_app.config.get("SITE_CHUNK_SIZE")
     click.echo(f"Extracting site data, chunk-size={chunk_size} timeout={timeout}")
-    while cb_extract.process_chunk(master_site_urls, chunk_size=chunk_size, timeout=timeout):
+    while cb_extract.process_chunk(
+        master_site_urls, chunk_size=chunk_size, timeout=timeout
+    ):
         cb_transform.process_admin_areas()
 
     # DLQ processing
     dlq_retries = current_app.config.get("PROCESSING_RETRY_COUNT")
     retry_urls = dlq.unload_dlq(dlq.DEAD_LETTER_QUEUE)
     for retry in range(dlq_retries):
-        while cb_extract.process_chunk(retry_urls, chunk_size=chunk_size, timeout=timeout):
+        while cb_extract.process_chunk(
+            retry_urls, chunk_size=chunk_size, timeout=timeout
+        ):
             cb_transform.process_admin_areas()
         else:
             click.echo("DLQ cleared!")

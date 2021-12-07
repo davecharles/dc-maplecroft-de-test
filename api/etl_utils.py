@@ -14,7 +14,9 @@ def on_fail(request: grequests.AsyncRequest, exception: Exception):
     dlq.add_to_dlq(request.url)
 
 
-def chunk(g: typing.Generator[typing.Iterable, None, None], chunk_size: int) -> typing.Any:
+def chunk(
+    g: typing.Generator[typing.Iterable, None, None], chunk_size: int
+) -> typing.Any:
     """Enable chunk consumption of a generator.
 
     Pops first element to guarantee StopIteration when generator exhausted,
