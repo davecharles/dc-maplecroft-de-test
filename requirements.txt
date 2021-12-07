@@ -12,3 +12,6 @@ apispec[yaml]
 apispec-webframeworks
 tox
 gunicorn
+shapely
+country_converter
+grequests
