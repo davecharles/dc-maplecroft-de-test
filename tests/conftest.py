@@ -1,15 +1,17 @@
+import datetime
 import json
 import pytest
 from dotenv import load_dotenv
 
-from api.models import User
+from api.models import User, Site
 from api.app import create_app
 from api.extensions import db as _db
 from pytest_factoryboy import register
-from tests.factories import UserFactory
+from tests.factories import UserFactory, SiteFactory
 
 
 register(UserFactory)
+register(SiteFactory)
 
 
 @pytest.fixture(scope="session")
@@ -82,3 +84,22 @@ def admin_refresh_headers(admin_user, client):
         'content-type': 'application/json',
         'authorization': 'Bearer %s' % tokens['refresh_token']
     }
+
+
+@pytest.fixture
+def site(db):
+    s = Site(
+        id="copenhagen-1234",
+        city="Copenhagen",
+        country="DNK",
+        latitude=55.1,
+        longitude=12.5,
+        name="station",
+        timestamp=datetime.datetime.utcnow(),
+        used=1,
+        available=0,
+        admin_area="AREA-51",
+    )
+    db.session.add(s)
+    db.session.commit()
+    return s
