@@ -1,8 +1,10 @@
 """Geo Boundaries API extraction."""
-import click
-import grequests
+import functools
 import json
 import typing
+
+import click
+import grequests
 
 from flask import current_app
 
@@ -35,7 +37,8 @@ def fetch_geoboundary_resource(geo_resource_url: str) -> dict:
     return response.json()
 
 
-def get_geoboundary_features(geo_resource_url) -> typing.Generator[dict, None, None]:
+@functools.lru_cache(maxsize=10)
+def get_geoboundary_features(geo_resource_url: str) -> list:
     """Get geoboundary features.
 
     Given a geoboundary resource URL, checks for local copy. If not available,
@@ -50,9 +53,11 @@ def get_geoboundary_features(geo_resource_url) -> typing.Generator[dict, None, N
     except FileNotFoundError:
         click.echo(f"No cached features for: {resource_name}")
         data = fetch_geoboundary_resource(geo_resource_url)
-    return (feature for feature in data["features"])
+    # return (feature for feature in data["features"])
+    return data["features"]
 
 
+@functools.lru_cache(maxsize=128)
 def fetch_geoboundary_url(country_code: str) -> str:
     """Fetch geoboundary URL.
 
