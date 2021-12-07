@@ -1,14 +1,18 @@
 import datetime
 import json
 import pytest
+from pytest_factoryboy import register
+from unittest.mock import Mock
+
 from dotenv import load_dotenv
+from shapely.geometry import shape, Point
 
 from api.models import User, Site
 from api.app import create_app
 from api.extensions import db as _db
-from pytest_factoryboy import register
-from tests.factories import UserFactory, SiteFactory
+from api import gb_extract as gbe
 
+from tests.factories import UserFactory, SiteFactory
 
 register(UserFactory)
 register(SiteFactory)
@@ -103,3 +107,58 @@ def site(db):
     db.session.add(s)
     db.session.commit()
     return s
+
+
+@pytest.fixture
+def chunkable_generator_int():
+    return (i for i in range(14))
+
+
+@pytest.fixture
+def chunkable_generator_str():
+    return ("url" for i in range(14))
+
+
+@pytest.fixture
+def coords():
+    return [[[[0.0, 0.0],
+       [0.0, 10.0],
+       [10.0, 10.0],
+       [10.0, 0.0],
+       ]]]
+
+
+@pytest.fixture
+def area(coords):
+    return shape(
+        {
+            "type": "MultiPolygon",
+            "coordinates": coords,
+         }
+
+    )
+
+
+@pytest.fixture
+def features(coords):
+    feature = {
+        "type": "Feature",
+        "properties": {
+            "shapeName": "Castelletto Monferrato",
+            "shapeISO": "None",
+            "shapeID": "ITA-ADM3-3_0_0-B1",
+            "shapeGroup": "ITA", "shapeType": "ADM3"
+        },
+        "geometry": {
+            "type": "MultiPolygon",
+            "coordinates": coords,
+        }
+    }
+    return [feature, feature, feature]
+
+
+@pytest.fixture
+def fake_load_geoboundary_data(monkeypatch, features):
+    def mock_meth(*args, **kwargs):
+        return features
+    monkeypatch.setattr(gbe, "load_geoboundary_data", mock_meth)

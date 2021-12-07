@@ -15,8 +15,8 @@ def on_fail(request: grequests.AsyncRequest, exception: Exception):
 
 
 def chunk(
-    g: typing.Generator[typing.Iterable, None, None], chunk_size: int
-) -> typing.Any:
+    g: typing.Generator[typing.Any, None, None], chunk_size: int
+) -> typing.Iterator:
     """Enable chunk consumption of a generator.
 
     Pops first element to guarantee StopIteration when generator exhausted,
